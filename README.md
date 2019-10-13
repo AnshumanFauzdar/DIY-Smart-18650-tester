@@ -37,6 +37,6 @@ Idea is taken from instructables (https://www.instructables.com/id/DIY-Arduino-B
 
 ### Schematics and connection
 
-
+![](https://github.com/AnshumanFauzdar/DIY-Smart-18650-tester/blob/master/Schematic.jpg)
 
 

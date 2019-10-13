@@ -26,7 +26,6 @@ Adafruit_BMP280 bmp; // I2C
 #define MOSFET_Pin 2
 #define Bat_Pin A0
 #define Res_Pin A1
-#define Buzzer_Pin 9
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
 float Capacity = 0.0; // Capacity in mAh
 float Res_Value = 10.0;  // Resistor Value in Ohm
@@ -35,8 +34,8 @@ float Current = 0.0; // Current in Amp
 float mA=0;         // Current in mA
 float Bat_Volt = 0.0;  // Battery Voltage 
 float Res_Volt = 0.0;  // Voltage at lower end of the Resistor 
-float Bat_High = 4.4; // Battery High Voltage
-float Bat_Low = 2.9; // Discharge Cut Off Voltage
+float Bat_High = 4.2; // Battery High Voltage
+float Bat_Low = 3.3; // Discharge Cut Off Voltage
 unsigned long previousMillis = 0; // Previous time in ms
 unsigned long millisPassed = 0;  // Current time in ms
 float sample1 =0;
@@ -50,18 +49,11 @@ int row = 0;
   
   void setup() {
    Serial.begin(115200);
-    if(!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) { // Address 0x3D for 128x64
-    Serial.println(F("SSD1306 allocation failed"));
-    for(;;);
-  }
-  delay(2000);
-  display.setTextSize(2);
-  display.setTextColor(WHITE);
- 
-  Serial.println(F("BMP280 test"));
+    
+    Serial.println(F("BMP280 test"));
 
   if (!bmp.begin(0x76)) {
-    Serial.println(F("Could not find a valid BMP280 sensor, check wiring!"));
+    Serial.println(F("Bhai nhi chal rha, wiring check kar!"));
     while (1);
   }
 
@@ -71,17 +63,38 @@ bmp.setSampling(Adafruit_BMP280::MODE_NORMAL,     /* Operating Mode. */
                   Adafruit_BMP280::FILTER_X16,      /* Filtering. */
                   Adafruit_BMP280::STANDBY_MS_500); /* Standby time. */
  
-   pinMode(MOSFET_Pin, OUTPUT);
-   pinMode(Buzzer_Pin, OUTPUT);
+   if(!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) { 
+    Serial.println(F("SSD1306 allocation failed"));
+    for(;;);
+  }
+  delay(2000);
+  display.clearDisplay();
+  display.setTextSize(2);
+  display.setTextColor(WHITE);
+
+  
+   pinMode(MOSFET_Pin, OUTPUT);   
    digitalWrite(MOSFET_Pin, LOW);  // MOSFET is off during the start
    Serial.println("CLEARDATA");
    Serial.println("LABEL,Time,Bat_Volt,capacity");
    
    //Serial.println("Arduino Battery Capacity Tester v1.0");
    Serial.println("BattVolt Current mAh");
+  
+display.setCursor(0,10);
+display.println("Battery Tester v1.0");
+display.display();
+delay(1000);
+display.clearDisplay();
+  
   }
-  //********************************Main Loop Function***********************************************************
-  void loop() {
+
+  
+  
+//********************************Main Loop Function***********************************************************
+  
+void loop() {
+
 //Vcc = readVcc()/1000.0; // Conevrrt mV to Volt
 
   
@@ -127,33 +140,38 @@ else if(Bat_Volt >= Bat_Low && Bat_Volt < Bat_High){
   display.print(Capacity, 1);
   display.display(); 
   }
-
+  
+//************ Measuring Temperature ***********
  display.setCursor(0,35);
+ display.println("T:");
+ display.display();
+ display.setCursor(25,35);
  display.println(bmp.readTemperature());
  display.display(); 
- display.setCursor(60,35);
+ display.setCursor(90,35);
  display.println((char)247);
  display.display(); 
- display.setCursor(70,35);
+ display.setCursor(100,35);
  display.println("C");
  display.display();
  display.clearDisplay();
+ 
 
 
-    Serial.print(F("Temperature = "));
-    Serial.print(bmp.readTemperature());
-    Serial.println(" *C");
+Serial.print(F("Temperature = "));
+Serial.print(bmp.readTemperature());
+Serial.println(" *C");
 
-    Serial.print(F("Pressure = "));
-    Serial.print(bmp.readPressure());
-    Serial.println(" Pa");
+Serial.print(F("Pressure = "));
+Serial.print(bmp.readPressure());
+Serial.println(" Pa");
 
-    Serial.print(F("Approx altitude = "));
-    Serial.print(bmp.readAltitude(1013.25)); /* Adjusted to local forecast! */
-    Serial.println(" m");
+Serial.print(F("Approx altitude = "));
+Serial.print(bmp.readAltitude(1013.25)); /* Adjusted to local forecast! */
+Serial.println(" m");
 
-    Serial.println();
-    delay(100);
+Serial.println();
+delay(100);
 
 
   
@@ -180,13 +198,13 @@ else if(Bat_Volt >= Bat_Low && Bat_Volt < Bat_High){
   if ( Bat_Volt > Bat_High){
     digitalWrite(MOSFET_Pin, LOW); // Turned Off the MOSFET // No discharge 
     Serial.println( "Warning High-V! ");
-    delay(1000);
+    delay(100);
    }
    
    else if(Bat_Volt < Bat_Low){
       digitalWrite(MOSFET_Pin, LOW);      
       Serial.println( "Warning Low-V! ");
-      delay(1000);
+      delay(100);
   }
   else if(Bat_Volt > Bat_Low && Bat_Volt < Bat_High  ) { // Check if the battery voltage is within the safe limit
       digitalWrite(MOSFET_Pin, HIGH);
@@ -201,5 +219,5 @@ else if(Bat_Volt >= Bat_Low && Bat_Volt < Bat_High){
       delay(4000); 
  
      }
-  
+ 
  }    

@@ -63,13 +63,13 @@ bmp.setSampling(Adafruit_BMP280::MODE_NORMAL,     /* Operating Mode. */
                   Adafruit_BMP280::FILTER_X16,      /* Filtering. */
                   Adafruit_BMP280::STANDBY_MS_500); /* Standby time. */
  
-   if(!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) { 
+   if(!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) { // Address 0x3D for 128x64
     Serial.println(F("SSD1306 allocation failed"));
     for(;;);
   }
   delay(2000);
   display.clearDisplay();
-  display.setTextSize(2);
+  display.setTextSize(1);
   display.setTextColor(WHITE);
 
   
@@ -93,7 +93,7 @@ display.clearDisplay();
   
 //********************************Main Loop Function***********************************************************
   
-void loop() {
+  void loop() {
 
 //Vcc = readVcc()/1000.0; // Conevrrt mV to Volt
 
@@ -102,56 +102,55 @@ void loop() {
   
   //************ Measuring Battery Voltage ***********
 
-
 if( Bat_Volt < 1){
   display.setCursor(0,10);
   display.println("No Battery");
    display.display();  
     }
 else if ( Bat_Volt > Bat_High){
-  display.setCursor(5,10);
+  display.setCursor(0,10);
   display.println("High Voltage"); 
   display.display(); 
 
   
   } 
 else if(Bat_Volt < Bat_Low){
-  display.setCursor(10,20);
+  display.setCursor(0,10);
   display.println("Low Voltage"); 
   display.display(); 
   }
 else if(Bat_Volt >= Bat_Low && Bat_Volt < Bat_High){
   display.setCursor(0,10);
   display.println("Volt:");
-  display.setCursor(0,10);
+  display.setCursor(0,20);
   display.println("Current:");
-   display.setCursor(0,10);
+   display.setCursor(0,30);
   display.println("mAh:");
   
-  display.setCursor(10,20);
+  display.setCursor(30,10);
   display.print(Bat_Volt,2);
   display.println("V");
   display.display(); 
-  display.setCursor(10,30);
+  display.setCursor(55,20);
   display.print(mA,0);
   display.println("mA");
   display.display(); 
-  display.setCursor(10,40);
+  display.setCursor(20,30);
   display.print(Capacity, 1);
   display.display(); 
   }
   
 //************ Measuring Temperature ***********
- display.setCursor(0,35);
+ display.setCursor(0,55);
  display.println("T:");
  display.display();
- display.setCursor(25,35);
+ display.setCursor(12,55);
  display.println(bmp.readTemperature());
  display.display(); 
- display.setCursor(90,35);
+ display.setCursor(40,55);
  display.println((char)247);
  display.display(); 
- display.setCursor(100,35);
+ display.setCursor(45,55);
  display.println("C");
  display.display();
  display.clearDisplay();
@@ -181,7 +180,7 @@ delay(100);
    delay (2);
   }
   sample1=sample1/100; 
-  Bat_Volt = 2* sample1 *Vcc/ 1024.0; 
+  Bat_Volt = 1* sample1 *Vcc/ 1024.0; 
 
   // *********  Measuring Resistor Voltage ***********
 
@@ -191,7 +190,7 @@ delay(100);
    delay (2);
   }
   sample2=sample2/100;
-  Res_Volt = 2* sample2 * Vcc/ 1024.0;
+  Res_Volt = 1* sample2 * Vcc/ 1024.0;
 
   //********************* Checking the different conditions *************
   
